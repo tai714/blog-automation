@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="buhi console">
+<meta name="theme-color" content="#04384c">
+<title>buhi-gadget console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Noto+Serif+JP:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #04384c;
+    --ink-deep: #02222e;
+    --ink-darker: #011820;
+    --paper: #f4ede0;
+    --paper-soft: #ebe3d2;
+    --accent: #c9a961;
+    --accent-soft: #d4b876;
+    --rule: rgba(244, 237, 224, 0.15);
+    --rule-strong: rgba(244, 237, 224, 0.35);
+    --green: #7ba889;
+    --red: #c87b7b;
+    --purple: #9d8ab5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { background: var(--ink-darker); }
+  body {
+    font-family: 'Noto Serif JP', 'Fraunces', Georgia, serif;
+    color: var(--paper);
+    line-height: 1.6;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(201, 169, 97, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(4, 56, 76, 0.4) 0%, transparent 50%),
+      linear-gradient(180deg, var(--ink-darker) 0%, var(--ink-deep) 100%);
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  .wrap { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  header {
+    border-bottom: 1px solid var(--rule-strong);
+    padding-bottom: 28px;
+    margin-bottom: 36px;
+    position: relative;
+  }
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+  .masthead-top .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(42px, 7vw, 64px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--paper);
+  }
+  h1 .amp {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+  .tagline {
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--paper-soft);
+    opacity: 0.7;
+    font-family: 'Noto Serif JP', serif;
+  }
+  .rule-ornament {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .rule-ornament::before,
+  .rule-ornament::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+  .rule-ornament span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  section { margin-bottom: 44px; }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .section-num {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--accent);
+    line-height: 1;
+    min-width: 44px;
+  }
+  .section-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--paper);
+    letter-spacing: 0.02em;
+  }
+  .section-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--paper-soft);
+    opacity: 0.5;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 12px;
+  }
+
+  a.card {
+    display: block;
+    background: linear-gradient(165deg, rgba(244, 237, 224, 0.04) 0%, rgba(244, 237, 224, 0.01) 100%);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 18px 18px 16px;
+    text-decoration: none;
+    color: var(--paper);
+    transition: transform 0.15s ease, border-color 0.2s ease, background 0.2s ease;
+    min-height: 92px;
+    position: relative;
+    overflow: hidden;
+  }
+  a.card:active {
+    transform: scale(0.97);
+    background: linear-gradient(165deg, rgba(201, 169, 97, 0.1) 0%, rgba(201, 169, 97, 0.03) 100%);
+    border-color: var(--accent);
+  }
+  @media (hover: hover) {
+    a.card:hover {
+      border-color: var(--accent);
+      background: linear-gradient(165deg, rgba(201, 169, 97, 0.08) 0%, rgba(201, 169, 97, 0.02) 100%);
+    }
+  }
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .card-mark {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .arrow {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--paper-soft);
+    opacity: 0.4;
+    transform: rotate(-45deg);
+    display: inline-block;
+    line-height: 1;
+  }
+  .card-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    color: var(--paper);
+    margin-bottom: 4px;
+  }
+  .card-desc {
+    font-size: 12px;
+    color: var(--paper-soft);
+    opacity: 0.6;
+    line-height: 1.4;
+  }
+
+  /* Article list - denser layout */
+  .article-list {
+    border-top: 1px solid var(--rule);
+  }
+  a.article-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 4px;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    color: var(--paper);
+    transition: background 0.15s ease, padding 0.2s ease;
+    min-height: 60px;
+  }
+  a.article-row:active {
+    background: rgba(201, 169, 97, 0.08);
+    padding-left: 12px;
+  }
+  @media (hover: hover) {
+    a.article-row:hover {
+      background: rgba(201, 169, 97, 0.05);
+      padding-left: 10px;
+    }
+  }
+  .article-num {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--accent);
+    min-width: 28px;
+    flex-shrink: 0;
+  }
+  .article-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.4;
+    flex: 1;
+  }
+  .article-arrow {
+    color: var(--paper-soft);
+    opacity: 0.4;
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--paper-soft);
+    opacity: 0.4;
+    text-transform: uppercase;
+  }
+  footer .ornament {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    color: var(--accent);
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  /* Tablet / larger phones */
+  @media (min-width: 768px) {
+    .grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  }
+  /* Small phones */
+  @media (max-width: 400px) {
+    .wrap { padding: 24px 16px 48px; }
+    .grid { grid-template-columns: 1fr; }
+    h1 { font-size: 38px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="masthead-top">
+      <span><span class="dot"></span>console active</span>
+      <span>est. 2026</span>
+    </div>
+    <h1>buhi-gadget<br><span class="amp">&amp;</span> co. console</h1>
+    <p class="tagline">在宅SEパパの作業デッキ — iPad mini Edition</p>
+    <div class="rule-ornament"><span>a private workspace</span></div>
+  </header>
+
+  <!-- Section 01 -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <span class="section-title">サイト運営</span>
+      <span class="section-sub">site ops</span>
+    </div>
+    <div class="grid">
+      <a class="card" href="https://buhigadget.com/" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">home</span><span class="arrow">→</span></div>
+        <div class="card-title">ぶひがじぇ</div>
+        <div class="card-desc">公開サイトを訪問者目線で確認</div>
+      </a>
+      <a class="card" href="https://buhigadget.com/wp-admin/" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">wp-admin</span><span class="arrow">→</span></div>
+        <div class="card-title">WordPress 管理画面</div>
+        <div class="card-desc">記事編集・下書き確認・設定変更</div>
+      </a>
+      <a class="card" href="https://buhigadget.com/wp-admin/edit.php" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">posts</span><span class="arrow">→</span></div>
+        <div class="card-title">投稿一覧</div>
+        <div class="card-desc">下書き・公開記事のリライト作業</div>
+      </a>
+      <a class="card" href="https://www.xserver.ne.jp/login_server.php" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">xserver</span><span class="arrow">→</span></div>
+        <div class="card-title">Xserverパネル</div>
+        <div class="card-desc">サーバー管理・バックアップ</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Section 02 -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <span class="section-title">分析・計測</span>
+      <span class="section-sub">analytics</span>
+    </div>
+    <div class="grid">
+      <a class="card" href="https://search.google.com/search-console" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">gsc</span><span class="arrow">→</span></div>
+        <div class="card-title">Search Console</div>
+        <div class="card-desc">検索パフォーマンス・インデックス状況</div>
+      </a>
+      <a class="card" href="https://analytics.google.com/" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">ga4</span><span class="arrow">→</span></div>
+        <div class="card-title">Google Analytics</div>
+        <div class="card-desc">訪問者行動・ページ滞在時間</div>
+      </a>
+      <a class="card" href="https://www.bing.com/webmasters/" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">bing wmt</span><span class="arrow">→</span></div>
+        <div class="card-title">Bing Webmaster</div>
+        <div class="card-desc">ChatGPT引用対応・Bing流入分析</div>
+      </a>
+      <a class="card" href="https://pagespeed.web.dev/" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">speed</span><span class="arrow">→</span></div>
+        <div class="card-title">PageSpeed Insights</div>
+        <div class="card-desc">表示速度・Core Web Vitals計測</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Section 03 -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <span class="section-title">アフィリエイト</span>
+      <span class="section-sub">affiliates</span>
+    </div>
+    <div class="grid">
+      <a class="card" href="https://af.moshimo.com/af/user/top" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">moshimo</span><span class="arrow">→</span></div>
+        <div class="card-title">もしもアフィリエイト</div>
+        <div class="card-desc">楽天・Yahoo!・Amazon統合管理</div>
+      </a>
+      <a class="card" href="https://www.a8.net/as/login/" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">a8</span><span class="arrow">→</span></div>
+        <div class="card-title">A8.net</div>
+        <div class="card-desc">セルフバック・高単価案件</div>
+      </a>
+      <a class="card" href="https://www.valuecommerce.ne.jp/" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">vc</span><span class="arrow">→</span></div>
+        <div class="card-title">バリューコマース</div>
+        <div class="card-desc">ヤマダ・ノジマ・エディオン提携</div>
+      </a>
+      <a class="card" href="https://affiliate.amazon.co.jp/" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">amazon</span><span class="arrow">→</span></div>
+        <div class="card-title">Amazonアソシエイト</div>
+        <div class="card-desc">仮登録中・180日3件ノルマ</div>
+      </a>
+      <a class="card" href="https://affiliate.rakuten.co.jp/" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">rakuten</span><span class="arrow">→</span></div>
+        <div class="card-title">楽天アフィリエイト</div>
+        <div class="card-desc">もしも経由でレポート確認も可</div>
+      </a>
+      <a class="card" href="https://www.google.com/adsense/" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">adsense</span><span class="arrow">→</span></div>
+        <div class="card-title">Google AdSense</div>
+        <div class="card-desc">記事15本以降に申請予定</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Section 04 -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <span class="section-title">AI・開発</span>
+      <span class="section-sub">ai & dev</span>
+    </div>
+    <div class="grid">
+      <a class="card" href="https://claude.ai/" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">claude</span><span class="arrow">→</span></div>
+        <div class="card-title">Claude</div>
+        <div class="card-desc">戦略壁打ち・プロンプト設計</div>
+      </a>
+      <a class="card" href="https://console.anthropic.com/" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">console</span><span class="arrow">→</span></div>
+        <div class="card-title">Anthropic Console</div>
+        <div class="card-desc">API残高・使用量モニタ</div>
+      </a>
+      <a class="card" href="https://console.anthropic.com/settings/billing" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">billing</span><span class="arrow">→</span></div>
+        <div class="card-title">API Billing</div>
+        <div class="card-desc">月額上限・残高チャージ</div>
+      </a>
+      <a class="card" href="https://github.com/" target="_blank" rel="noopener">
+        <div class="card-top"><span class="card-mark">github</span><span class="arrow">→</span></div>
+        <div class="card-title">GitHub</div>
+        <div class="card-desc">blog-automation スクリプト管理</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Section 05 -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <span class="section-title">公開済み記事</span>
+      <span class="section-sub">published works</span>
+    </div>
+    <div class="article-list">
+      <a class="article-row" href="https://buhigadget.com/hhkb-professional-hybrid-type-s-review/" target="_blank" rel="noopener">
+        <span class="article-num">i</span>
+        <span class="article-title">HHKB Professional HYBRID Type-S レビュー</span>
+        <span class="article-arrow">→</span>
+      </a>
+      <a class="article-row" href="https://buhigadget.com/steam-deck-oled-1tb-review/" target="_blank" rel="noopener">
+        <span class="article-num">ii</span>
+        <span class="article-title">Steam Deck OLED 1TB レビュー</span>
+        <span class="article-arrow">→</span>
+      </a>
+      <a class="article-row" href="https://buhigadget.com/steam-deck-oled-all-models-review/" target="_blank" rel="noopener">
+        <span class="article-num">iii</span>
+        <span class="article-title">Steam Deck 全モデル比較</span>
+        <span class="article-arrow">→</span>
+      </a>
+      <a class="article-row" href="https://buhigadget.com/boox-go7-review-ereader/" target="_blank" rel="noopener">
+        <span class="article-num">iv</span>
+        <span class="article-title">BOOX Go7 レビュー</span>
+        <span class="article-arrow">→</span>
+      </a>
+      <a class="article-row" href="https://buhigadget.com/boox-go7-gocolor7gen2-review/" target="_blank" rel="noopener">
+        <span class="article-num">v</span>
+        <span class="article-title">BOOX Go7 / GoColor7Gen2 比較</span>
+        <span class="article-arrow">→</span>
+      </a>
+      <a class="article-row" href="https://buhigadget.com/shokz-openfit-series-comparison-2025/" target="_blank" rel="noopener">
+        <span class="article-num">vi</span>
+        <span class="article-title">Shokz OpenFit シリーズ比較</span>
+        <span class="article-arrow">→</span>
+      </a>
+      <a class="article-row" href="https://buhigadget.com/benq-screenbar-series-comparison/" target="_blank" rel="noopener">
+        <span class="article-num">vii</span>
+        <span class="article-title">BenQ ScreenBar シリーズ比較</span>
+        <span class="article-arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="ornament">❦</div>
+    <div>crafted for tarisuke · iPad mini edition</div>
+  </footer>
+
+</div>
+</body>
+</html>
